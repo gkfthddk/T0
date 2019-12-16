@@ -92,6 +92,18 @@ def getPaused(creds):
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
     #print("Paused list : ",result)
     return result
+select id, cache_dir from wmbs_job
+
+def getJobs(creds):
+    dbconn = cx_Oracle.connect(creds[0], creds[1], creds[2])
+    cursor = dbconn.cursor() 
+    #Get a number of paused jobs
+    query =  "SELECT id, cache_dir, wmbs_job.state FROM wmbs_job"
+    #print(query)
+    cursor.execute(query)
+    result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
+    print("job list : ",result)
+    return result
 
 def main():
     """
@@ -154,6 +166,9 @@ The status of this build can be found at : {}.
         filesetList = getFilesets(creds)
         filesetCount = len(filesetList)
         #print("fileset count {}".format(filesetCount))
+        if(timing%30):
+            Print("getJobs")
+            dump=getJobs(creds)
         if filesetCount == 0:
             try:
                 if(calljira):jiraReporting.addJiraComment(jira, jira_instance, newIssue, "All filesets were closed.")
