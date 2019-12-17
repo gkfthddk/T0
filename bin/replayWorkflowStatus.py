@@ -98,7 +98,7 @@ def getJobs(creds):
     dbconn = cx_Oracle.connect(creds[0], creds[1], creds[2])
     cursor = dbconn.cursor() 
     #Get a number of paused jobs
-    query =  "SELECT id, cache_dir, wmbs_job.state FROM wmbs_job"
+    query =  "SELECT wmbs_job_state.name, wmbs_job_state.id FROM wmbs_job"
     #print(query)
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
