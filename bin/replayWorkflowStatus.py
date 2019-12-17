@@ -126,7 +126,6 @@ def main():
 
     print(sys.argv)
     if len(sys.argv) == 7:
-        print("Setting jira environment")
         buildNumber = sys.argv[1]
         hostName = os.popen('hostname').read().rstrip()
         print("hostname : ", hostName)
@@ -136,6 +135,8 @@ def main():
         prLink = sys.argv[5]
         buildurl = sys.argv[6]
         calljira = int(sys.argv[7])
+        if(calljira):print("Jira reporting is open.")
+        else:print("Jira reporting is ignored.")
 
         print("buildNumber : ",buildNumber)
         print("Pull request title : ",prTitle)
