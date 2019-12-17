@@ -167,7 +167,7 @@ The status of this build can be found at : {}.
         filesetCount = len(filesetList)
         #print("fileset count {}".format(filesetCount))
         if(timing%30):
-            Print("getJobs")
+            print("getJobs")
             dump=getJobs(creds)
         if filesetCount == 0:
             try:
