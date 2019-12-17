@@ -92,7 +92,6 @@ def getPaused(creds):
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
     #print("Paused list : ",result)
     return result
-select id, cache_dir from wmbs_job
 
 def getJobs(creds):
     dbconn = cx_Oracle.connect(creds[0], creds[1], creds[2])
