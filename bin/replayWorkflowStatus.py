@@ -97,7 +97,7 @@ def getJobs(creds):
     dbconn = cx_Oracle.connect(creds[0], creds[1], creds[2])
     cursor = dbconn.cursor() 
     #Get a number of paused jobs
-    query =  "SELECT name FROM wmbs_job_state" #wmbs_jobs_state.id error
+    query =  "SELECT name,id FROM wmbs_job_state" #wmbs_jobs_state.id error
     #query =  "SELECT name FROM wmbs_job" #wmbs_jobs_state.id error
     #print(query)
     cursor.execute(query)
