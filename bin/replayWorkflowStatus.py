@@ -119,6 +119,7 @@ def main():
 
     #Get the proxy
     proxy_info = jiraReporting.getProxy(proxy)
+    print("proxy info",proxy_info)
 
     #Initialize JIRA instance 
     jira = JIRA(jira_url)
