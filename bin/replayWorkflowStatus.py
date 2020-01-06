@@ -182,6 +182,14 @@ The status of this build can be found at : {}.
             print("Fileset left {}".format(filesetCount))
             if(timing>30 and timing%60==0):
                 print("Fileset list : ",filesetList)
+                exfilesetList=filesetList
+                if(timing>300 and exfilesetList==filesetList):
+                    print("It takes too long without changes")
+                    exit(-1)
+                if(timing>720):
+                    print("It's been over 12 hours, fails.")
+                    exit(-1)
+                    
         timing+=1
         pausedList = getPaused(creds)
         pausedCount = len(pausedList)
