@@ -126,7 +126,7 @@ def main():
     jira._session.cookies = cj
 
     print(sys.argv)
-    if len(sys.argv) == 7:
+    if len(sys.argv) == 8:
         buildNumber = sys.argv[1]
         hostName = os.popen('hostname').read().rstrip()
         print("hostname : ", hostName)
