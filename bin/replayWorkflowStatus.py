@@ -168,9 +168,9 @@ The status of this build can be found at : {}.
         filesetList = getFilesets(creds)
         filesetCount = len(filesetList)
         #print("fileset count {}".format(filesetCount))
-        if(timing%30):
-            print("getJobs")
-            dump=getJobs(creds)
+        #if(timing%30):
+        #    print("getJobs")
+        #    dump=getJobs(creds)
         if filesetCount == 0:
             try:
                 if(calljira):jiraReporting.addJiraComment(jira, jira_instance, newIssue, "All filesets were closed.")
