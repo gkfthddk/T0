@@ -35,8 +35,8 @@ tier0Config = createTier0Config()
 setConfigVersion(tier0Config, "replace with real version")
 
 # Set run number to replay
-setInjectRuns(tier0Config, [ 333414 ])
-print("inject run 332601")
+setInjectRuns(tier0Config, [ 308406 ])
+print("inject run 308406")
 
 # Settings up sites
 processingSite = "T2_CH_CERN"
