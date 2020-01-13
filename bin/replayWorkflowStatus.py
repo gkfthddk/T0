@@ -204,6 +204,7 @@ The status of this build can be found at : {}.
             except:print(pausedList)
             pausedMessage="*There are {} paused jobs in the replay.* List of Paused job below.".format(pausedCount)+pausedMessage
             print(pausedMessage)
+            print(pausedList)
             try:
                 if(calljira):jiraReporting.addJiraComment(jira, jira_instance, newIssue, pausedMessage)
                 if(calljira):jiraReporting.addJiraComment(jira, jira_instance, newIssue, "Replay was closed by paused job")
