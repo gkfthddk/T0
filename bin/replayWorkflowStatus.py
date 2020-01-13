@@ -74,7 +74,7 @@ def getFilesets(creds):
     cursor = dbconn.cursor()
     #Get a number of filesets
     #query = "SELECT COUNT(*) FROM wmbs_fileset"
-    query = "SELECT id, name, FROM wmbs_fileset"
+    query = "SELECT id, name FROM wmbs_fileset"
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name),(id,name),]
     
