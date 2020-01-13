@@ -74,7 +74,8 @@ def getFilesets(creds):
     cursor = dbconn.cursor()
     #Get a number of filesets
     #query = "SELECT COUNT(*) FROM wmbs_fileset"
-    query = "SELECT id, name, open FROM wmbs_fileset"
+    #query = "SELECT id, name, open FROM wmbs_fileset"
+    query = "SELECT * FROM wmbs_fileset"
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name),(id,name),]
     
@@ -124,7 +125,7 @@ def main():
     #Initialize JIRA instance 
     jira = JIRA(jira_url)
     jira._session.cookies = cj
-
+    
     print(sys.argv)
     if len(sys.argv) == 8:
         buildNumber = sys.argv[1]
