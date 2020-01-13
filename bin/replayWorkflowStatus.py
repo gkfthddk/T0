@@ -199,7 +199,8 @@ The status of this build can be found at : {}.
         
         if pausedCount != 0:
             pausedMessage="*There are {} paused jobs in the replay.*".format(pausedCount)
-            pausedMessage=("\n{} : {}"*pausedCount).format(*[":".join([str(pausedName[0]),pausedName[1]]) for pausedName in pausedList])
+            try:pausedMessage=("\n{} : {}"*pausedCount).format(*[[str(pausedName[0]),pausedName[1]] for pausedName in pausedList])
+            except:print(pasuedList)
             pausedMessage="*There are {} paused jobs in the replay.* List of Paused job below.".format(pausedCount)+pausedMessage
             print(pausedMessage)
             try:
