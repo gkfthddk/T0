@@ -227,7 +227,7 @@ The status of this build can be found at : {}.
                 if(timing%3==0):
                     print("Repack Workflow list : ",repackworkflowList)
                     current_jobs=getJobs(creds)
-                    print("getJobs ",[[current_job[0],current_job[1],state_dic[current_job[2]]] current_job in current_jobs])
+                    print("getJobs ",[[current_job[0],current_job[1],state_dic[current_job[2]]] for current_job in current_jobs])
                 repackWorkflowCount = len(repackworkflowList)
             else:
                 try:
