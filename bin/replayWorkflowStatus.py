@@ -87,7 +87,7 @@ def getPaused(creds):
     dbconn = cx_Oracle.connect(creds[0], creds[1], creds[2])
     cursor = dbconn.cursor() 
     #Get a number of paused jobs
-    query =  "SELECT id, DISTINCT name, cache_dir FROM wmbs_job WHERE state = (SELECT id FROM wmbs_job_state WHERE name = 'jobpaused')"
+    query =  "SELECT id, name, cache_dir FROM wmbs_job WHERE state = (SELECT id FROM wmbs_job_state WHERE name = 'jobpaused')"
     #print(query)
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
@@ -99,7 +99,7 @@ def getJobs(creds):
     cursor = dbconn.cursor() 
     #Get a number of paused jobs
     #query =  "SELECT name,id FROM wmbs_job_state" #wmbs_jobs_state.id error
-    query =  "SELECT id,DISTINCT name,state FROM wmbs_job" #wmbs_jobs_state.id error
+    query =  "SELECT id, name,state FROM wmbs_job" #wmbs_jobs_state.id error
     #print(query)
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
