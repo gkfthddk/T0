@@ -74,7 +74,7 @@ def getFilesets(creds):
     cursor = dbconn.cursor()
     #Get a number of filesets
     #query = "SELECT COUNT(*) FROM wmbs_fileset"
-    query = "SELECT id, name FROM wmbs_fileset"
+    query = "SELECT id, name, state FROM wmbs_fileset"
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name),(id,name),]
     
@@ -98,11 +98,11 @@ def getJobs(creds):
     cursor = dbconn.cursor() 
     #Get a number of paused jobs
     #query =  "SELECT name,id FROM wmbs_job_state" #wmbs_jobs_state.id error
-    query =  "SELECT name,id,state FROM wmbs_job" #wmbs_jobs_state.id error
+    query =  "SELECT id,name,state FROM wmbs_job" #wmbs_jobs_state.id error
     #print(query)
     cursor.execute(query)
     result = cursor.fetchall() #[(id,name,cache_dir),(id,name,cache_dir),]
-    print("job list : ",result)
+    #print("job list : ",result)
     return result
 
 def main():
@@ -155,7 +155,10 @@ The status of this build can be found at : {}.
     # To stop sending emails, comment out the line below
     # send an email with the summary of Jira issues
     #sendEmailAlert(tickets, sources, extraComment)
-
+    state_dic={1:'created',2:'createcooloff',3:'jobfailed',4:'cleanout',5:'killed',
+                6:'complete',7:'submitfailed',8:'submitcooloff',9:'retrydone',10:'none',
+                11:'submitpaused',12:'jobcooloff',13:'executing',14:'success',15:'createpaused',
+                16:'new',17:'jobpaused',18:'createfailed',19:'exhausted'}
     creds=getT0astCreds()
     repackWorkflowCount = 1
     expressWorkflowCount = 1
@@ -221,7 +224,10 @@ The status of this build can be found at : {}.
             print("Checking Repack workflows... repackworkflowcount {}".format(repackWorkflowCount))
             if repackWorkflowCount > 0:
                 repackworkflowList = getWorkflowCount(creds, "Repack")
-                print("Repack Workflow list : ",repackworkflowList)
+                if(timing%3==0):
+                    print("Repack Workflow list : ",repackworkflowList)
+                    current_jobs=getJobs(creds)
+                    print("getJobs ",[[current_job[0],current_job[1],state_dic[current_job[2]]] current_job in current_jobs])
                 repackWorkflowCount = len(repackworkflowList)
             else:
                 try:
