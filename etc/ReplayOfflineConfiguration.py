@@ -35,7 +35,7 @@ tier0Config = createTier0Config()
 setConfigVersion(tier0Config, "replace with real version")
 
 # Set run number to replay
-setInjectRuns(tier0Config, [ 317696 ])
+setInjectRuns(tier0Config, [ 310364 ])
 print("inject run 327527")
 
 # Settings up sites
