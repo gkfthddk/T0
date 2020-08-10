@@ -35,7 +35,8 @@ tier0Config = createTier0Config()
 setConfigVersion(tier0Config, "replace with real version")
 
 # Set run number to replay
-setInjectRuns(tier0Config, [ 329990, 329995 ])
+setInjectRuns(tier0Config, [ 328802 ])
+print("inject run 327527")
 
 # Settings up sites
 processingSite = "T2_CH_CERN"
@@ -1569,4 +1570,3 @@ ignoreStream(tier0Config, "streamDQMRates")
 
 if __name__ == '__main__':
     print(tier0Config)
-
