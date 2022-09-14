@@ -51,6 +51,7 @@ password = pypi-...
     git checkout <tag>
 
 ### PyPI packaging script
+    cd ..
     git clone https://github.com/gkfthddk/T0.git T0_pypi
 
     cp T0_pypi/MANIFEST.in T0/
