@@ -12,7 +12,7 @@ Based on https://github.com/dmwm/WMCore/wiki/DMWM-Packaging-with-PyPi
 
     virtualenv --python=python3.6 pypienv
     source pypienv/bin/activate
-    pip3 install t0=3.0.5a1
+    pip3 install t0==3.0.5a1
 
 for test-pypi
 
@@ -66,7 +66,9 @@ for test-pypi
     cp T0_pypi/etc/build_testpypi_packages.sh T0/etc/build_pypi_packages.sh
 
 `requirments.txt` need to be checked for valid required package version.
+
 Package will be uploaded as version in `src/python/T0/__init__.py`.
+
 `<version>` include release version and pre, post release version(eg. `3.0.5a1`) and cannot be duplicated. Removing or replacing version is not recommanded.
 
 ### Upload package to PyPI
