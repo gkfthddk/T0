@@ -285,10 +285,15 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
         # write run/stream processing completion record
         insertRunStreamDoneDAO = daoFactory(classname = "RunConfig.InsertRunStreamDone")
+        
+        insertDAO={}
 
         # write stream/dataset mapping (for special express and error datasets)
         insertDatasetDAO = daoFactory(classname = "RunConfig.InsertPrimaryDataset")
         insertStreamDatasetDAO = daoFactory(classname = "RunConfig.InsertStreamDataset")
+        
+        for mapping in ['PrimaryDataset','StreamDataset']:
+            insertDAO[mapping] = daoFactory(classname = f"RunConfig.Insert{mapping}")
 
         # write stream configuration
         insertCMSSWVersionDAO = daoFactory(classname = "RunConfig.InsertCMSSWVersion")
@@ -303,22 +308,26 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
         insertWorkflowMonitoringDAO = daoFactory(classname = "RunConfig.InsertWorkflowMonitoring")
         insertStorageNodeDAO = daoFactory(classname = "RunConfig.InsertStorageNode")
         insertPhEDExConfigDAO = daoFactory(classname = "RunConfig.InsertPhEDExConfig")
+        
+        for mapping in ['CMSSWVersion','RepackConfig','PromptCalibration','ExpressConfig','DatasetScenario','StreamFileset','RecoReleaseConfig','WorkflowMonitoring','StorageNode','PhEDExConfig']:
+            insertDAO[mapping] = daoFactory(classname = f"RunConfig.Insert{mapping}")
 
         bindsRunStreamDone = {'RUN' : run,
                               'STREAM' : stream}
-        bindsCMSSWVersion = []
-        bindsDataset = []
-        bindsStreamDataset = []
+        binds={}
+        binds['CMSSWVersion'] = []
+        binds['Dataset'] = []
+        binds['StreamDataset'] = []
         bindsStreamStyle = {'RUN' : run,
                             'STREAM' : stream,
                             'STYLE': streamConfig.ProcessingStyle }
-        bindsRepackConfig = {}
-        bindsPromptCalibration = {}
-        bindsExpressConfig = {}
-        bindsSpecialDataset = {}
-        bindsDatasetScenario = []
-        bindsStorageNode = []
-        bindsPhEDExConfig = []
+        binds['RepackConfig'] = {}
+        binds['PromptCalibration'] = {}
+        binds['ExpressConfig'] = {}
+        binds['SpecialDataset'] = {}
+        binds['DatasetScenario'] = []
+        binds['StorageNode'] = []
+        binds['PhEDExConfig'] = []
 
         #
         # for spec creation, details for all outputs
@@ -345,7 +354,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
             streamConfig.Repack.CMSSWVersion = streamConfig.VersionOverride.get(onlineVersion, onlineVersion)
 
-            bindsCMSSWVersion.append( { 'VERSION' : streamConfig.Repack.CMSSWVersion } )
+            binds['CMSSWVersion'].append( { 'VERSION' : streamConfig.Repack.CMSSWVersion } )
 
             streamConfig.Repack.ScramArch = tier0Config.Global.ScramArches.get(streamConfig.Repack.CMSSWVersion,
                                                                                tier0Config.Global.DefaultScramArch)
@@ -353,7 +362,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
             # check for era or run dependent config parameters
             streamConfig.Repack.ProcessingVersion = extractConfigParameter(streamConfig.Repack.ProcessingVersion, runInfo['acq_era'], run)
 
-            bindsRepackConfig = { 'RUN' : run,
+            binds['RepackConfig'] = { 'RUN' : run,
                                   'STREAM' : stream,
                                   'PROC_VER': streamConfig.Repack.ProcessingVersion,
                                   'MAX_SIZE_SINGLE_LUMI' : streamConfig.Repack.MaxSizeSingleLumi,
@@ -373,13 +382,13 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
             streamConfig.Express.Scenario = extractConfigParameter(streamConfig.Express.Scenario, runInfo['acq_era'], run)
 
             specialDataset = "Stream%s" % stream
-            bindsDataset.append( { 'PRIMDS' : specialDataset } )
-            bindsStreamDataset.append( { 'RUN' : run,
+            binds['PrimaryDataset'].append( { 'PRIMDS' : specialDataset } )
+            binds['StreamDataset'].append( { 'RUN' : run,
                                          'PRIMDS' : specialDataset,
                                          'STREAM' : stream } )
             bindsSpecialDataset = { 'STREAM' : stream,
                                     'PRIMDS' : specialDataset }
-            bindsDatasetScenario.append( { 'RUN' : run,
+            binds['DatasetScenario'].append( { 'RUN' : run,
                                            'PRIMDS' : specialDataset,
                                            'SCENARIO' : streamConfig.Express.Scenario } )
 
@@ -390,7 +399,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
             if streamConfig.Express.ArchivalNode or streamConfig.Express.TapeNode or streamConfig.Express.DiskNode:
 
-                bindsPhEDExConfig.append( { 'RUN' : run,
+                binds['PhEDExConfig'].append( { 'RUN' : run,
                                             'PRIMDS' : specialDataset,
                                             'ARCHIVAL_NODE' : streamConfig.Express.ArchivalNode,
                                             'TAPE_NODE' : streamConfig.Express.TapeNode,
@@ -419,7 +428,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
                         numPromptCalibProd += 1
 
                 if numPromptCalibProd > 0:
-                    bindsPromptCalibration = { 'RUN' : run,
+                    binds['PromptCalibration'] = { 'RUN' : run,
                                                'STREAM' : stream,
                                                'NUM_PRODUCER' : numPromptCalibProd }
 
@@ -427,7 +436,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
             streamConfig.Express.CMSSWVersion = streamConfig.VersionOverride.get(onlineVersion, onlineVersion)
 
-            bindsCMSSWVersion.append( { 'VERSION' : streamConfig.Express.CMSSWVersion } )
+            binds['CMSSWVersion'].append( { 'VERSION' : streamConfig.Express.CMSSWVersion } )
 
             streamConfig.Express.ScramArch = tier0Config.Global.ScramArches.get(streamConfig.Express.CMSSWVersion,
                                                                                 tier0Config.Global.DefaultScramArch)
@@ -438,7 +447,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
                 # check for era or run dependent config parameters
                 streamConfig.Express.RecoCMSSWVersion = extractConfigParameter(streamConfig.Express.RecoCMSSWVersion, runInfo['acq_era'], run)
 
-                bindsCMSSWVersion.append( { 'VERSION' : streamConfig.Express.RecoCMSSWVersion } )
+                binds['CMSSWVersion'].append( { 'VERSION' : streamConfig.Express.RecoCMSSWVersion } )
 
                 streamConfig.Express.RecoScramArch = tier0Config.Global.ScramArches.get(streamConfig.Express.RecoCMSSWVersion,
                                                                                         tier0Config.Global.DefaultScramArch)
@@ -449,7 +458,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
             write_tiers = joinComma(streamConfig.Express.DataTiers)
 
-            bindsExpressConfig = { 'RUN' : run,
+            binds['ExpressConfig'] = { 'RUN' : run,
                                    'STREAM' : stream,
                                    'PROC_VER' : streamConfig.Express.ProcessingVersion,
                                    'WRITE_TIERS' : write_tiers,
@@ -493,7 +502,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
                 if datasetConfig.ArchivalNode or datasetConfig.TapeNode or datasetConfig.DiskNode or datasetConfig.DiskNodeReco:
 
-                    bindsPhEDExConfig.append( { 'RUN' : run,
+                    binds['PhEDExConfig'].append( { 'RUN' : run,
                                                 'PRIMDS' : dataset,
                                                 'ARCHIVAL_NODE' : datasetConfig.ArchivalNode,
                                                 'TAPE_NODE' : datasetConfig.TapeNode,
@@ -534,7 +543,7 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
 
                 if streamConfig.Express.ArchivalNode or streamConfig.Express.TapeNode or streamConfig.Express.DiskNode:
 
-                    bindsPhEDExConfig.append( { 'RUN' : run,
+                    binds['PhEDExConfig'].append( { 'RUN' : run,
                                                 'PRIMDS' : dataset,
                                                 'ARCHIVAL_NODE' : streamConfig.Express.ArchivalNode,
                                                 'TAPE_NODE' : streamConfig.Express.TapeNode,
@@ -638,40 +647,29 @@ def configureRunStream(tier0Config, run, stream, specDirectory, dqmUploadProxy):
         #
         try:
             myThread.transaction.begin()
-            if len(bindsCMSSWVersion) > 0:
-                insertCMSSWVersionDAO.execute(bindsCMSSWVersion, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsDataset) > 0:
-                insertDatasetDAO.execute(bindsDataset, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsStreamDataset) > 0:
-                insertStreamDatasetDAO.execute(bindsStreamDataset, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsRepackConfig) > 0:
-                insertRepackConfigDAO.execute(bindsRepackConfig, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsPromptCalibration) > 0:
-                insertPromptCalibrationDAO.execute(bindsPromptCalibration, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsExpressConfig) > 0:
-                insertExpressConfigDAO.execute(bindsExpressConfig, conn = myThread.transaction.conn, transaction = True)
+            for mapping in ['CMSSWVersion','RepackConfig','PromptCalibration','ExpressConfig','DatasetScenario','StorageNode','PhEDExConfig']:
+                if len(binds[mapping]) > 0:
+                    insertDAO[mapping].execute(binds[mapping], conn = myThread.transaction.conn, transaction = True)
+            if len(binds['PrimaryDataset']) > 0:
+                insertDAO['PrimaryDataset'].execute(binds['PrimaryDataset'], conn = myThread.transaction.conn, transaction = True)
+            if len(binds['StreamDataset']) > 0:
+                insertDAO['StreamDataset'].execute(binds['StreamDataset'], conn = myThread.transaction.conn, transaction = True)
             if len(bindsSpecialDataset) > 0:
                 insertSpecialDatasetDAO.execute(bindsSpecialDataset, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsDatasetScenario) > 0:
-                insertDatasetScenarioDAO.execute(bindsDatasetScenario, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsStorageNode) > 0:
-                insertStorageNodeDAO.execute(bindsStorageNode, conn = myThread.transaction.conn, transaction = True)
-            if len(bindsPhEDExConfig) > 0:
-                insertPhEDExConfigDAO.execute(bindsPhEDExConfig, conn = myThread.transaction.conn, transaction = True)
             insertRunStreamDoneDAO.execute(bindsRunStreamDone, conn = myThread.transaction.conn, transaction = True)
             insertStreamStyleDAO.execute(bindsStreamStyle, conn = myThread.transaction.conn, transaction = True)
             if streamConfig.ProcessingStyle in [ 'Bulk', 'Express' ]:
-                insertStreamFilesetDAO.execute(run, stream, filesetName, conn = myThread.transaction.conn, transaction = True)
+                insertDAO['StreamFileset'].execute(run, stream, filesetName, conn = myThread.transaction.conn, transaction = True)
                 fileset.load()
                 wmbsHelper.createSubscription(wmSpec.getTask(taskName), fileset, alternativeFilesetClose = True)
-                insertWorkflowMonitoringDAO.execute([fileset.id],  conn = myThread.transaction.conn, transaction = True)
+                insertDAO['WorkflowMonitoring'].execute([fileset.id],  conn = myThread.transaction.conn, transaction = True)
             if streamConfig.ProcessingStyle == "Bulk":
                 bindsRecoReleaseConfig = []
                 for fileset, primds in list(wmbsHelper.getMergeOutputMapping().items()):
                     bindsRecoReleaseConfig.append( { 'RUN' : run,
                                                      'PRIMDS' : primds,
                                                      'FILESET' : fileset } )
-                insertRecoReleaseConfigDAO.execute(bindsRecoReleaseConfig, conn = myThread.transaction.conn, transaction = True)
+                insertDAO['RecoReleaseConfig'].execute(bindsRecoReleaseConfig, conn = myThread.transaction.conn, transaction = True)
         except Exception as ex:
             logging.exception(ex)
             myThread.transaction.rollback()
